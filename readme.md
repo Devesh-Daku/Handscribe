@@ -67,7 +67,7 @@ Backend/
   - `POST /upload-matrix`: Receives `{ label, matrix }` from frontend and saves it as a timestamped JSON file in `data/`.
 
 - **JSON File Structure**
-```json
+```bash
 {
   "y": "hello",
   "x": [[0.0, 0.0, ...], [0.0, 0.1, ...], ...]
