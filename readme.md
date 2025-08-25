@@ -99,3 +99,6 @@ Frontend stores matrices locally as CSV (optional) and can also send to backend.
 Backend stores matrices as JSON with label and timestamped filename.
 
 Make sure CORS is configured if frontend and backend are on different ports.
+
+
+https://github.com/githubharald/SimpleHTR

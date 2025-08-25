@@ -1,5 +1,5 @@
-// src/components/Controls.js
-export default function Controls({ onRecognize, onClear, onStore, onSend }) {
+// src/components/Controls.jsx
+export default function Controls({ onRecognize, onClear, onStore, onSend,}) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
