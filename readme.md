@@ -67,7 +67,7 @@ Backend/
   - `POST /upload-matrix`: Receives `{ label, matrix }` from frontend and saves it as a timestamped JSON file in `data/`.
 
 - **JSON File Structure**
-```json
+```bash
 {
   "y": "hello",
   "x": [[0.0, 0.0, ...], [0.0, 0.1, ...], ...]
@@ -99,3 +99,6 @@ Frontend stores matrices locally as CSV (optional) and can also send to backend.
 Backend stores matrices as JSON with label and timestamped filename.
 
 Make sure CORS is configured if frontend and backend are on different ports.
+
+
+https://github.com/githubharald/SimpleHTR
