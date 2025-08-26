@@ -1,0 +1,3 @@
+npm i
+pip install numpy pillow
+node server.js
