@@ -1,0 +1,8 @@
+Setup a virtual enviournment of python 3.8 
+in this folder 
+run virtual enviournment
+.\.venv\Scripts\activate
+enter pip install -r requirements.txt
+
+to check model is working 
+python main.py --img_file ../data/line.png
