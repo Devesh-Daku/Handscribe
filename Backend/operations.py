@@ -1,61 +1,52 @@
-import os
+# backend/operations.py
+
+import sys
 import json
 import numpy as np
-from PIL import Image
+from PIL import Image # No change here
+import os
 
-# Configuration
-INPUT_FOLDER = "saved_matrices"
-OUTPUT_FOLDER = "processed_slices"
-TARGET_HEIGHT = 32  # model required input height
-TOP_SKIP_RATIO = 0.3  # skip 30% from top when checking empty
-BOTTOM_SKIP_RATIO = 0.2  # skip 20% from bottom
+# --- Configuration ---
+TARGET_HEIGHT = 32
+EMPTY_THRESHOLD = 200
 
-# Ensure output folder exists
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+def process_matrix_to_image(input_json_path, output_image_path):
+    try:
+        with open(input_json_path, 'r') as f:
+            matrix = json.load(f)
 
-# Loop through all JSON files
-for filename in os.listdir(INPUT_FOLDER):
-    if not filename.endswith(".json"):
-        continue
-
-    filepath = os.path.join(INPUT_FOLDER, filename)
-    with open(filepath, "r") as f:
-        data = json.load(f)
-
-    for line_key, matrix in data.items():
         matrix_np = np.array(matrix, dtype=np.uint8)
-        h, w = matrix_np.shape
 
-        # Check if slice is empty (considering middle region only)
-        top_idx = int(h * TOP_SKIP_RATIO)
-        bottom_idx = int(h * (1 - BOTTOM_SKIP_RATIO))
-        middle_slice = matrix_np[top_idx:bottom_idx, :]
-        if np.sum(middle_slice) < 100:  # threshold for empty
-            continue  # skip this slice
+        if np.sum(matrix_np) < EMPTY_THRESHOLD:
+            return
 
-        # Crop whitespace from left and right
-        cols_with_content = np.where(np.max(matrix_np, axis=0) > 0)[0]
-        if len(cols_with_content) == 0:
-            continue
-        x_min, x_max = cols_with_content[0], cols_with_content[-1] + 1
-        cropped_array = matrix_np[:, x_min:x_max]
+        rows = np.where(np.max(matrix_np, axis=1) > 0)[0]
+        cols = np.where(np.max(matrix_np, axis=0) > 0)[0]
+        if len(rows) == 0 or len(cols) == 0:
+            return
 
-        # Convert to image (0=black background, 255=white text)
-        img_array = np.zeros_like(cropped_array, dtype=np.uint8)
-        img_array[cropped_array > 0] = 255
+        cropped_array = matrix_np[rows[0]:rows[-1]+1, cols[0]:cols[-1]+1]
+        img_array = np.full_like(cropped_array, 255, dtype=np.uint8)
+        img_array[cropped_array > 0] = 0
         img = Image.fromarray(img_array)
 
-        # Resize while keeping aspect ratio
         aspect_ratio = img.width / img.height
         target_width = max(1, int(TARGET_HEIGHT * aspect_ratio))
-        resized_img = img.resize((target_width, TARGET_HEIGHT), Image.Resampling.LANCZOS)
+        
+        # --- THIS IS THE CORRECTED LINE ---
+        resized_img = img.resize((target_width, TARGET_HEIGHT), Image.LANCZOS)
 
-        # Save image
-        base_name = os.path.splitext(filename)[0]  # temp1
-        output_name = f"temp_{line_key}.png"
-        output_path = os.path.join(OUTPUT_FOLDER, output_name)
-        resized_img.save(output_path)
+        resized_img.save(output_image_path)
+        
+    except Exception as e:
+        print(f"Error in Python script: {e}", file=sys.stderr)
+        sys.exit(1)
 
-        print(f"Saved: {output_path}")
-
-print("Processing complete!")
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python operations.py <input_json_path> <output_image_path>", file=sys.stderr)
+        sys.exit(1)
+    
+    input_path = sys.argv[1]
+    output_path = sys.argv[2]
+    process_matrix_to_image(input_path, output_path)

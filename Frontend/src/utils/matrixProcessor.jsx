@@ -33,7 +33,7 @@ export const processMatrixForSending = (canvas) => {
 };
 
 export const sendMatrixToServer = async (dataToSend) => {
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPLOAD_MATRIX}`, {
+  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.API_RECOGANIZED}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dataToSend),

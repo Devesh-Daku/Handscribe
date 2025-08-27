@@ -1,3 +1,9 @@
 ./node_modules
 ./saved_matrices/*
 ./processed_slices/*
+node_modules
+venv
+node_modules
+./node_modules/*
+./output/images/*
+./output/matrices/*

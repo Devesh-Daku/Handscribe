@@ -13,6 +13,7 @@ export const CANVAS_CONFIG = {
 export const API_CONFIG = {
   BASE_URL: "http://localhost:5000",
   ENDPOINTS: {
-    UPLOAD_MATRIX: "/upload-matrix"
+    UPLOAD_MATRIX: "/upload-matrix",
+    API_RECOGANIZED: "/api/recognize/upload-matrix"
   }
 };

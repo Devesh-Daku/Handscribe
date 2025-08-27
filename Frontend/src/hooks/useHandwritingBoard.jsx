@@ -1,3 +1,4 @@
+// src/hooks/useHandwritingBoard.jsx
 import { useState, useRef } from 'react';
 import { clearCanvas, toGrayscaleMatrix, downloadCSV } from '../utils/canvasUtils';
 import { processMatrixForSending, sendMatrixToServer } from '../utils/matrixProcessor';
