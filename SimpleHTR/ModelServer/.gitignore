@@ -1,5 +1,6 @@
 ./__pycache__
-./temp_uploads/*
+./temp_uploads/*.png
+
 __pycache__
 ./venv
 ./venv/*
