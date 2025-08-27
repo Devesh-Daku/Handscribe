@@ -1,0 +1,17 @@
+python -m venv venv ## creating a virtual enviournment as model and model server will have a clash
+
+then inside this folder 
+run 
+.\venv\Scripts\activate
+# First, upgrade pip itself (this is good practice)
+python -m pip install --upgrade pip
+
+# Now, install all the libraries for the model and the API
+pip install fastapi "uvicorn[standard]"
+pip install tensorflow==2.4.0
+pip install opencv-python
+pip install numpy
+pip install python-multipart # Needed by FastAPI for file uploads
+
+run 
+uvicorn model_api:app --reload  // for running the model 
