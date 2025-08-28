@@ -1,17 +1,29 @@
-import React from "react";
+// src/components/RecognizedOutput.jsx
+import React from 'react';
 
-export default function RecognizedOutput({ recognized }) {
-  if (!recognized) {
-    return <p className="text-xs text-gray-500">Write on the canvas, then click <b>Recognize</b>.</p>;
-  }
-
+export default function RecognizedOutput({ lineResults, totalLines }) {
+  const sortedLines = Array.from({ length: totalLines }).map((_, i) => {
+    const lineKey = `line_${i + 1}`;
+    const result = lineResults[lineKey];
+    if (result?.isLoading) {
+      return <span key={lineKey} className="text-blue-500">Recognizing...</span>;
+    }
+    if (result?.text) {
+      return result.text;
+    }
+    return ""; // Return empty string for lines not yet recognized
+  });
+  
   return (
-    <div className="text-sm">
-      <div className="font-medium">Matrix dims: {recognized.dims[0]} × {recognized.dims[1]}</div>
-      <div className="mt-2">Top-left sample (4×8):</div>
-      <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto max-h-64">
-        {JSON.stringify(recognized.sample, null, 2)}
-      </pre>
+    <div className="w-full p-4 border rounded-lg bg-white min-h-[100px]">
+      <h3 className="font-bold text-lg mb-2">Recognized Text</h3>
+      <div className="text-gray-800 whitespace-pre-wrap font-sans">
+        {sortedLines.map((text, index) => (
+          <div key={index} className="min-h-[1.5em]">
+            {text}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
