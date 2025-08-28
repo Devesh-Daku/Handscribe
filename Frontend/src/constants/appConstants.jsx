@@ -1,19 +1,15 @@
-// src/constants/appConstant.jsx
+// src/constants/appConstants.jsx
+
 export const CANVAS_CONFIG = {
-  SIZE: 512,
-  LINE_WIDTH: 2,
-  TOTAL_LINES: 5,
-  PADDING: 10,
-  MATRIX_DIMENSIONS: {
-    FULL: { width: 512, height: 512 },
-    SAMPLE: { width: 64, height: 64 }
-  }
+  DEFAULT_SIZE: 512,
+  DEFAULT_LINE_WIDTH: 3,
+  DEFAULT_GUIDELINES: 5,
 };
 
 export const API_CONFIG = {
-  BASE_URL: "http://localhost:5000",
+  BASE_URL: "http://192.168.0.101:5000",
   ENDPOINTS: {
-    UPLOAD_MATRIX: "/upload-matrix",
-    API_RECOGANIZED: "/api/recognize/upload-matrix"
-  }
+    // Ensure this is the only endpoint defined and is named correctly
+    API_RECOGNIZE: "/api/recognize/upload-matrix",
+  },
 };

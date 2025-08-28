@@ -1,23 +1,37 @@
-export default function Controls({ onRecognize, onClear, onStore, onSend, onSendSplit }) {
+// src/components/Controls.jsx
+import React from 'react';
+import ActionButtons from './Controls/ActionButtons';
+import CanvasSettings from './Controls/CanvasSettings';
+import ToolSettings from './Controls/ToolSettings';
+
+export default function Controls(props) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex gap-2 flex-wrap">
-        <button className="px-4 py-2 rounded-xl border shadow" onClick={onRecognize}>
-          Recognize
-        </button>
-        <button className="px-4 py-2 rounded-xl border shadow" onClick={onClear}>
-          Clear
-        </button>
-        <button className="px-4 py-2 rounded-xl border shadow" onClick={onStore}>
-          Store
-        </button>
-        <button className="px-4 py-2 rounded-xl border shadow" onClick={onSend}>
-          Send Matrix
-        </button>
-        <button className="px-4 py-2 rounded-xl border shadow" onClick={onSendSplit}>
-          Send Split Matrices
-        </button>
-      </div>
+    <div className="flex flex-col gap-4 p-4 border rounded-lg bg-gray-50">
+      <ActionButtons
+        handleRecognize={props.handleRecognize}
+        handleUndo={props.handleUndo}
+        handleClear={props.handleClear}
+        isLoading={props.apiState.isLoading}
+        canUndo={props.history.current.length > 0}
+      />
+      <hr/>
+      <CanvasSettings
+        size={props.size}
+        setSize={props.setSize}
+        backgroundColor={props.backgroundColor}
+        setBackgroundColor={props.setBackgroundColor}
+        guidelines={props.guidelines}
+        setGuidelines={props.setGuidelines}
+        showGuidelines={props.showGuidelines}
+        setShowGuidelines={props.setShowGuidelines}
+      />
+      <hr/>
+      <ToolSettings
+        tool={props.tool}
+        setTool={props.setTool}
+        penSize={props.penSize}
+        setPenSize={props.setPenSize}
+      />
     </div>
   );
 }

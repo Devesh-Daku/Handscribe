@@ -1,46 +1,73 @@
-import React, { useEffect, useRef, useState } from "react";
-import { initCanvas } from "../utils/canvasUtils";
+import React, { useEffect, useState, forwardRef } from "react";
 
-export default function CanvasBoard({ size, lineWidth, onDrawEnd, defaultGuidelines = 5 }) {
-  const canvasRef = useRef(null);
+const CanvasBoard = forwardRef(({
+  size,
+  tool,
+  penSize,
+  guidelines,
+  showGuidelines,
+  backgroundColor,
+  history,
+  onLineChange,
+  onStrokeEnd,
+  onDrawingStart,
+}, ref) => {
   const [isDrawing, setIsDrawing] = useState(false);
-  const [guidelines, setGuidelines] = useState(defaultGuidelines);
+  const [activeLine, setActiveLine] = useState({ current: null, previous: null });
 
-  // Initialize canvas once
+  // This effect triggers recognition when the user moves to a new line
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = initCanvas(canvas, size, lineWidth);
+    if (activeLine.previous !== null && activeLine.current !== activeLine.previous) {
+      onLineChange(activeLine.previous);
+    }
+  }, [activeLine, onLineChange]);
 
-    drawGuidelines(ctx, size, guidelines);
-  }, []); // only once
+  // This effect handles all canvas setup and re-initialization.
+  // This was the missing part from your snippet.
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, size, size);
+    if (showGuidelines) drawGuidelines(ctx);
+    history.current = [];
+  }, [size, guidelines, showGuidelines, backgroundColor, ref, history]);
 
-  const drawGuidelines = (ctx, size, count) => {
+  const saveState = () => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    if (history.current.length > 20) history.current.shift();
+    history.current.push(canvas.toDataURL());
+  };
+
+  const drawGuidelines = (ctx) => {
     ctx.save();
-    ctx.strokeStyle = "#ccc";
+    ctx.strokeStyle = "#e0e0e0";
     ctx.lineWidth = 1;
-    
-    // Add bottom padding (like a real notebook)
-    const bottomPadding = 30;
-    const usableSpace = size - bottomPadding;
-    
-    // Calculate section height: divide usable space by number of sections
-    const sectionHeight = usableSpace / count;
-    
-    // Draw guidelines (count-1 lines to create count sections)
-    for (let i = 1; i <= count; i++) {
+    const PADDING_BOTTOM = 20;
+    const usableHeight = size - PADDING_BOTTOM;
+    const sectionHeight = usableHeight / guidelines;
+    for (let i = 1; i <= guidelines; i++) {
       const y = i * sectionHeight;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(size, y);
       ctx.stroke();
     }
-    
     ctx.restore();
   };
+  
+  const getCtx = () => ref.current.getContext("2d");
 
-  const getCtx = () => canvasRef.current.getContext("2d");
   const getPoint = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
+    const rect = ref.current.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     return { x: clientX - rect.left, y: clientY - rect.top };
@@ -48,11 +75,24 @@ export default function CanvasBoard({ size, lineWidth, onDrawEnd, defaultGuideli
 
   const onPointerDown = (e) => {
     e.preventDefault();
+    saveState();
+    const { y } = getPoint(e);
+
+    const PADDING_BOTTOM = 20;
+    const usableHeight = size - PADDING_BOTTOM;
+    const sectionHeight = usableHeight / guidelines;
+    const currentLineIndex = Math.min(guidelines - 1, Math.floor(y / sectionHeight));
+    
+    onDrawingStart(currentLineIndex);
+    setActiveLine(prev => ({ current: currentLineIndex, previous: prev.current }));
+
     const ctx = getCtx();
-    const { x, y } = getPoint(e);
+    const { x } = getPoint(e);
     ctx.beginPath();
     ctx.moveTo(x, y);
     setIsDrawing(true);
+    ctx.lineWidth = penSize;
+    ctx.strokeStyle = tool === 'eraser' ? backgroundColor : 'black';
   };
 
   const onPointerMove = (e) => {
@@ -68,69 +108,19 @@ export default function CanvasBoard({ size, lineWidth, onDrawEnd, defaultGuideli
     if (!isDrawing) return;
     e.preventDefault();
     setIsDrawing(false);
-    onDrawEnd(canvasRef.current);
+    getCtx().closePath();
+    onStrokeEnd(activeLine.current);
   };
-
-  const addGuideline = () => {
-    const ctx = getCtx();
-    
-    // Clear the canvas and redraw with new guidelines
-    ctx.clearRect(0, 0, size, size);
-    
-    // Reinitialize canvas settings
-    initCanvas(canvasRef.current, size, lineWidth);
-    
-    // Draw new guidelines
-    drawGuidelines(ctx, size, guidelines + 1);
-    setGuidelines(guidelines + 1);
-  };
-
-  const removeGuideline = () => {
-    if (guidelines <= 1) return; // Prevent going below 1
-    
-    const ctx = getCtx();
-    
-    // Clear the canvas and redraw with fewer guidelines
-    ctx.clearRect(0, 0, size, size);
-    
-    // Reinitialize canvas settings
-    initCanvas(canvasRef.current, size, lineWidth);
-    
-    // Draw new guidelines
-    drawGuidelines(ctx, size, guidelines - 1);
-    setGuidelines(guidelines - 1);
-  };
-
+  
   return (
-    <>
-      <canvas
-        ref={canvasRef}
-        className="border rounded-2xl shadow-lg bg-white touch-none"
-        width={size}
-        height={size}
-        onMouseDown={onPointerDown}
-        onMouseMove={onPointerMove}
-        onMouseUp={onPointerUp}
-        onMouseLeave={onPointerUp}
-        onTouchStart={onPointerDown}
-        onTouchMove={onPointerMove}
-        onTouchEnd={onPointerUp}
-      />
-      <div className="flex gap-2 mt-2">
-        <button 
-          onClick={addGuideline} 
-          className="px-3 py-1 bg-blue-200 rounded hover:bg-blue-300"
-        >
-          Add Guideline ({guidelines + 1})
-        </button>
-        <button 
-          onClick={removeGuideline} 
-          className="px-3 py-1 bg-red-200 rounded hover:bg-red-300"
-          disabled={guidelines <= 1}
-        >
-          Remove Guideline ({guidelines - 1})
-        </button>
-      </div>
-    </>
+    <canvas
+      ref={ref}
+      className="border-2 border-gray-300 rounded-lg shadow-md touch-none"
+      style={{ backgroundColor: backgroundColor }}
+      onMouseDown={onPointerDown} onMouseMove={onPointerMove} onMouseUp={onPointerUp} onMouseLeave={onPointerUp}
+      onTouchStart={onPointerDown} onTouchMove={onPointerMove} onTouchEnd={onPointerUp}
+    />
   );
-}
+});
+
+export default CanvasBoard;

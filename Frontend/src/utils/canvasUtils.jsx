@@ -1,4 +1,4 @@
-// utils/canvasUtils.jsx
+// src/utils/canvasUtils.jsx
 export const initCanvas = (canvas, size, lineWidth) => {
   const dpr = window.devicePixelRatio || 1;
   canvas.width = size * dpr;
