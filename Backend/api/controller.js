@@ -11,7 +11,8 @@ const MATRICES_SUBDIR = path.join(OUTPUT_DIR, "matrices");
 const IMAGES_SUBDIR = path.join(OUTPUT_DIR, "images");
 const PYTHON_EXECUTABLE = path.resolve("./venv/Scripts/python.exe");
 const PYTHON_SCRIPT_PATH = path.resolve("./operations.py");
-const MODEL_API_URL = "http://127.0.0.1:8000/predict/";
+// const MODEL_API_URL = "http://127.0.0.1:8000/predict/";
+const MODEL_API_URL = "https://handscribe.onrender.com/predict/";
 
 // This function processes a single line
 async function processLine(lineKey, matrix) {
