@@ -9,13 +9,18 @@ from path import Path
 from dataloader_iam import DataLoaderIAM, Batch
 from model import Model, DecoderType
 from preprocessor import Preprocessor
+import os # Make sure this is at the top of the file
 
+# --- THIS IS THE NEW, CORRECTED CODE ---
+# It calculates the absolute path to the project root
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SRC_DIR)
 
 class FilePaths:
     """Filenames and paths to data."""
-    fn_char_list = '../model/charList.txt'
-    fn_summary = '../model/summary.json'
-    fn_corpus = '../data/corpus.txt'
+    fn_char_list = os.path.join(PROJECT_ROOT, 'model', 'charList.txt')
+    fn_summary = os.path.join(PROJECT_ROOT, 'model', 'summary.json')
+    fn_corpus = os.path.join(PROJECT_ROOT, 'data', 'corpus.txt')
 
 
 def get_img_height() -> int:

@@ -6,13 +6,14 @@ import axios from "axios";
 import FormData from "form-data";
 
 // --- CONFIGURATION ---
-const OUTPUT_DIR = path.join("../output");
+const OUTPUT_DIR = path.resolve("../output"); // Go up one level
 const MATRICES_SUBDIR = path.join(OUTPUT_DIR, "matrices");
 const IMAGES_SUBDIR = path.join(OUTPUT_DIR, "images");
-const PYTHON_EXECUTABLE = path.resolve("./venv/Scripts/python.exe");
-const PYTHON_SCRIPT_PATH = path.resolve("./operations.py");
-// const MODEL_API_URL = "http://127.0.0.1:8000/predict/";
-const MODEL_API_URL = "https://handscribe.onrender.com/predict/";
+const PYTHON_EXECUTABLE = path.resolve("../.venv/Scripts/python.exe"); // Go up one level
+const PYTHON_SCRIPT_PATH = path.resolve("../operations.py"); // Go up one level
+
+const MODEL_API_URL = "http://127.0.0.1:8000/predict/";
+// const MODEL_API_URL = "https://handscribe.onrender.com/predict/";
 
 // This function processes a single line
 async function processLine(lineKey, matrix) {
