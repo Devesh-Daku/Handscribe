@@ -1,3 +1,5 @@
+# ModelServer/requirements.txt
+
 # API Framework (compatible versions)
 fastapi==0.70.0
 uvicorn[standard]==0.17.6

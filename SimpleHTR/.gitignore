@@ -13,3 +13,5 @@ dump/
 ./*/venv/*
 ./ModelServer/venv
 ./ModelServer/venv/*
+venv
+venv/*
