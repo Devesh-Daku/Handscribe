@@ -1,64 +1,44 @@
-# SimpleHTR/src/api.py
+# SimpleHTR/src/api.py (Temporary Debugging Version)
 
 import os
-import uuid
-import shutil
-import subprocess
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, UploadFile, File
 
-# --- Initialize the FastAPI app ---
-app = FastAPI(title="Hand Scribe API")
+app = FastAPI(title="Debug API")
 
 @app.get("/")
 def read_root():
-    return {"message": "Hand Scribe API is running!"}
+    return {"message": "Debugging API is running."}
 
 @app.post("/predict/")
-async def predict_image(image: UploadFile = File(...)):
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    temp_dir = os.path.join(project_root, "temp_uploads")
-    os.makedirs(temp_dir, exist_ok=True)
+async def debug_file_system(image: UploadFile = File(...)):
+    # This function will now print the file structure instead of running the model.
     
-    temp_image_path = os.path.join(temp_dir, f"_{uuid.uuid4().hex}.png")
-    with open(temp_image_path, "wb") as buffer:
-        shutil.copyfileobj(image.file, buffer)
-
+    print("\n\n--- DEBUGGING FILE STRUCTURE ---")
+    
     try:
-        main_script_path = os.path.join(project_root, 'src', 'main.py')
-        src_directory = os.path.join(project_root, 'src') # Define the src directory
+        # Get the path of the current script (api.py)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        print(f"Current Script Directory (src): {script_dir}")
+        print(f"Contents of '{script_dir}': {os.listdir(script_dir)}")
+
+        # Go up one level to the project root
+        project_root = os.path.dirname(script_dir)
+        print(f"\nProject Root Directory: {project_root}")
+        print(f"Contents of Project Root: {os.listdir(project_root)}")
+
+        # Specifically check for the 'model' folder
+        model_dir_path = os.path.join(project_root, 'model')
+        print(f"\nChecking for model directory at: {model_dir_path}")
         
-        command = [
-            "python",
-            main_script_path,
-            "--img_file",
-            temp_image_path
-        ]
+        if os.path.exists(model_dir_path):
+            print(f"✅ SUCCESS: 'model' directory found!")
+            print(f"Contents of 'model' directory: {os.listdir(model_dir_path)}")
+        else:
+            print(f"❌ ERROR: 'model' directory NOT FOUND at that path!")
 
-        print(f"Running command: {' '.join(command)}")
-        
-        # Execute the command
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            check=True,
-            encoding='utf-8',
-            cwd=src_directory  # <-- THE FIX: Set the working directory to 'src'
-        )
-        output = result.stdout
-        print(f"Script output:\n{output}")
+    except Exception as e:
+        print(f"An error occurred during debugging: {e}")
 
-        for line in output.splitlines():
-            if line.startswith('Recognized:'):
-                recognized_text = line.split('"')[1]
-                return {"recognized_text": recognized_text}
+    print("--- END DEBUGGING ---\n\n")
 
-        return {"recognized_text": "ERROR: Could not find 'Recognized:' in model output."}
-
-    except subprocess.CalledProcessError as e:
-        print(f"ERROR: The model script failed.")
-        print(f"Stderr:\n{e.stderr}")
-        return {"recognized_text": "ERROR: Model script failed."}
-    finally:
-        if os.path.exists(temp_image_path):
-            os.remove(temp_image_path)
+    return {"recognized_text": "DEBUG: Check Render logs for file structure."}
