@@ -3,30 +3,10 @@
 import os
 import uuid
 import shutil
+import subprocess
 from fastapi import FastAPI, File, UploadFile
-import cv2
 
-# Import from the local model.py file (lowercase 'm')
-from model import Model, preprocessor
-
-# --- Load the model once when the server starts ---
-print("Loading handwriting recognition model...")
-
-# Define paths relative to the main project root
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-model_dir = os.path.join(project_root, 'model')
-char_list_path = os.path.join(model_dir, 'charList.txt')
-weights_path = os.path.join(model_dir, 'snapshot-13')
-
-with open(char_list_path) as f:
-    char_list = list(f.read())
-
-# Initialize the model
-model = Model(char_list, decoder_type=0)
-model.load_weights(weights_path)
-print("Model loaded successfully.")
-
-# Initialize the FastAPI app
+# --- Initialize the FastAPI app ---
 app = FastAPI(title="Hand Scribe API")
 
 @app.get("/")
@@ -35,32 +15,45 @@ def read_root():
 
 @app.post("/predict/")
 async def predict_image(image: UploadFile = File(...)):
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     temp_dir = os.path.join(project_root, "temp_uploads")
     os.makedirs(temp_dir, exist_ok=True)
     
-    file_extension = os.path.splitext(image.filename)[1]
-    unique_filename = f"_{uuid.uuid4().hex}{file_extension}"
-    temp_image_path = os.path.join(temp_dir, unique_filename)
+    # Save the uploaded image to a temporary file
+    temp_image_path = os.path.join(temp_dir, f"_{uuid.uuid4().hex}.png")
+    with open(temp_image_path, "wb") as buffer:
+        shutil.copyfileobj(image.file, buffer)
 
     try:
-        with open(temp_image_path, "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer)
+        # --- Run the command, just like you did ---
+        main_script_path = os.path.join(project_root, 'src', 'main.py')
+        command = [
+            "python",             # Use the python in the server's own environment
+            main_script_path,
+            "--img_file",
+            temp_image_path
+        ]
 
-        print(f"Recognizing text from: {temp_image_path}")
-        img = cv2.imread(temp_image_path, cv2.IMREAD_GRAYSCALE)
+        print(f"Running command: {' '.join(command)}")
         
-        if img is None:
-            return {"recognized_text": "ERROR: Image could not be read."}
+        # Execute the command and capture the output
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+        output = result.stdout
+        print(f"Script output:\n{output}")
 
-        img = preprocessor(img, model.img_size, enhance=False)
-        text, prob = model.predict(img)
-        print(f"Recognized: '{text}' with probability {prob}")
-        
-        return {"recognized_text": text}
-        
-    except Exception as e:
-        print(f"An error occurred during recognition: {e}")
-        return {"recognized_text": "ERROR: An exception occurred during prediction."}
+        # --- Parse the output to find the recognized text ---
+        for line in output.splitlines():
+            if line.startswith('Recognized:'):
+                recognized_text = line.split('"')[1]
+                return {"recognized_text": recognized_text}
+
+        return {"recognized_text": "ERROR: Could not find 'Recognized:' in model output."}
+
+    except subprocess.CalledProcessError as e:
+        print(f"ERROR: The model script failed.")
+        print(f"Stderr:\n{e.stderr}")
+        return {"recognized_text": "ERROR: Model script failed."}
     finally:
+        # Clean up the temporary image file
         if os.path.exists(temp_image_path):
             os.remove(temp_image_path)
