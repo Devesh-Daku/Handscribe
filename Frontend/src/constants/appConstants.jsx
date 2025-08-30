@@ -7,7 +7,7 @@ export const CANVAS_CONFIG = {
 };
 
 export const API_CONFIG = {
-  BASE_URL: "http://192.168.0.101:5000",
+  BASE_URL: "http://localhost:5000",
   ENDPOINTS: {
     // Ensure this is the only endpoint defined and is named correctly
     API_RECOGNIZE: "/api/recognize/upload-matrix",
