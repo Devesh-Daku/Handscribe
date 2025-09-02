@@ -12,7 +12,7 @@ const IMAGES_SUBDIR = path.join(OUTPUT_DIR, "images");
 const PYTHON_EXECUTABLE = "python3"; 
 const PYTHON_SCRIPT_PATH = path.resolve("./operations.py"); 
 // const MODEL_API_URL = "http://127.0.0.1:8000/predict/"; // Local development
-const MODEL_API_URL = "https://handscribe.onrender.com/predict/";
+const MODEL_API_URL = 'https://handscribe.onrender.com/predict';
 
 // This function processes a single line
 async function processLine(lineKey, matrix) {

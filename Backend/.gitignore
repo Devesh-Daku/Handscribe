@@ -9,3 +9,4 @@ node_modules
 ./output/matrices/*.json
 ./output/matrices/*
 .\output\*
+.env

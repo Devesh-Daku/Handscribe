@@ -7,7 +7,7 @@ export const CANVAS_CONFIG = {
 };
 
 export const API_CONFIG = {
-  BASE_URL: "https://handscirbe-1.onrender.com/",
+  BASE_URL: "https://handscribe-backend.onrender.com",
   // BASE_URL: "http://192.168.0.101:5000",
 
   ENDPOINTS: {
