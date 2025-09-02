@@ -37,7 +37,7 @@ const corsOptions = {
 app.use(cors(corsOptions)); // Use the flexible CORS options
 app.use(express.json({ limit: "50mb" }));
 
-pp.get("/", (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).json({ status: "ok", message: "Backend is running." });
 });
 // --- Routes ---
