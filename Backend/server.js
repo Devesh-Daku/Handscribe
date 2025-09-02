@@ -1,19 +1,20 @@
 // backend/server.js
 import express from "express";
 import cors from "cors";
-import recognitionRoutes from "./api/routes.js"; // Import our new routes
+import recognitionRoutes from "./api/routes.js";
 
 const app = express();
 const PORT = 5000;
+const HOST = '0.0.0.0'; // <-- Add this line
 
 // Middleware setup
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 
-// Tell the app to use our routes for any URL starting with /api/recognize
 app.use("/api/recognize", recognitionRoutes);
 
-// Start the server
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
+// --- MODIFIED THIS LINE ---
+// Start the server and listen on the specified host
+app.listen(PORT, HOST, () =>
+  console.log(`Server running on http://${HOST}:${PORT}`)
 );
