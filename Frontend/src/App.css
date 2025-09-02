@@ -2,3 +2,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.outer {
+  background-image: 
+    /* 1. The semi-transparent color overlay */
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    /* 2. Your actual image */
+    url(./bg.png);
+  
+  background-size: cover;
+  background-position: center;
+  
+  /* Optional: Blend them together. 'multiply' often looks good. */
+  background-blend-mode: multiply;
+  color: white;
+}

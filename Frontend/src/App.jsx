@@ -53,7 +53,7 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen w-full flex flex-col text-gray-800">
+    <div className="outer min-h-screen w-full flex flex-col text-gray-800 ">
       <header className="flex items-center p-4 bg-white shadow-md z-20">
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 rounded-md hover:bg-gray-200 transition-colors" title="Toggle Settings">
           <MenuIcon />

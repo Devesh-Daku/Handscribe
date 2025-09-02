@@ -6,8 +6,8 @@ import glob
 
 # --- Configuration ---
 # The URL of your running Model API server
-MODEL_API_URL = "http://127.0.0.1:8000/predict/"
-
+# MODEL_API_URL = "http://127.0.0.1:8000/predict/"
+MODEL_API_URL = 'https://handscribe.onrender.com/predict'
 # The folder where your test images are stored
 TEST_IMAGES_FOLDER = "test_images"
 
