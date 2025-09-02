@@ -1,6 +1,6 @@
 // backend/api/routes.js
 import express from "express";
-import { handleRecognitionRequest } from "./controller.js";
+import { handleRecognitionRequest } from "./api/controller.js";
 
 const router = express.Router();
 
