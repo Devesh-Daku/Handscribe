@@ -4,6 +4,8 @@ import path from "path";
 import { spawn } from "child_process";
 import axios from "axios";
 import FormData from "form-data";
+import dotenv from "dotenv";
+dotenv.config();
 
 const OUTPUT_DIR = path.resolve("./output"); 
 const MATRICES_SUBDIR = path.join(OUTPUT_DIR, "matrices");
@@ -12,7 +14,7 @@ const IMAGES_SUBDIR = path.join(OUTPUT_DIR, "images");
 const PYTHON_EXECUTABLE = "python3"; 
 const PYTHON_SCRIPT_PATH = path.resolve("./operations.py"); 
 // const MODEL_API_URL = "http://127.0.0.1:8000/predict/"; // Local development
-const MODEL_API_URL = 'https://handscribe.onrender.com/predict';
+// const MODEL_API_URL = 
 
 // This function processes a single line
 async function processLine(lineKey, matrix) {
@@ -41,7 +43,7 @@ async function processLine(lineKey, matrix) {
   form.append("image", imageStream, { filename: path.basename(imageFilePath) });
   
   console.log(`Sending request to Model API for ${lineKey}...`);
-  const response = await axios.post(MODEL_API_URL, form);
+  const response = await axios.post(process.env.MODEL_API_URL, form);
   
   const { recognized_text } = response.data;
   console.log(`✅ Result for ${lineKey}: '${recognized_text}'`);

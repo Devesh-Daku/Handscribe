@@ -7,11 +7,10 @@ export const CANVAS_CONFIG = {
 };
 
 export const API_CONFIG = {
-  BASE_URL: "https://handscribe-backend.onrender.com",
-  // BASE_URL: "http://192.168.0.101:5000",
+  // Read the base URL from the environment variables
+  BASE_URL: import.meta.env.VITE_API_BASE_URL,
 
   ENDPOINTS: {
-    // Ensure this is the only endpoint defined and is named correctly
     API_RECOGNIZE: "/api/recognize/upload-matrix",
   },
 };
