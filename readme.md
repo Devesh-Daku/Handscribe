@@ -51,7 +51,7 @@ So, how does it all work together? I set it up with three main parts to keep thi
 
 Finally, the backend passes the recognized text back to the frontend for you to see. Pretty neat, right?!
 
-## 本地设置 (Getting Started)
+## (Getting Started)
 
 Want to get this running on your own machine? Awesome! Here's how to get the frontend and backend up and running. For local development, you can just use the live ML model I've already hosted on Render, which makes things way easier!
 
