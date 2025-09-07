@@ -1,21 +1,21 @@
-// src/App.jsx
-import React, { useState, useCallback } from "react"; // <-- Import useCallback
+import React, { useState, useCallback, useEffect } from "react";
 import CanvasBoard from "./components/CanvasBoard";
 import RecognizedOutput from "./components/RecognizedOutput";
 import { useHandwritingBoard } from "./hooks/useHandwritingBoard";
 import { CANVAS_CONFIG } from "./constants/appConstants";
 import "./App.css";
 
+// Import the wake-up utility function and the new status sidebar
+import { startWakeUpSequence } from './utils/serverwakeup.jsx';
+import ServerStatusSidebar from "./components/ServerStatusSidebar";
+
 // Import sub-components
 import ActionButtons from "./components/Controls/ActionButtons";
 import CanvasSettings from "./components/Controls/CanvasSettings";
 import ToolSettings from "./components/Controls/ToolSettings";
 
-// Import the wake-up utility function
-import { startWakeUpSequence } from './utils/serverwakeup.jsx';
-
 const MenuIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
   </svg>
 );
@@ -23,6 +23,8 @@ const MenuIcon = () => (
 export default function App() {
   const { canvasRef, history, lineResults, handlers } = useHandwritingBoard();
   const { handleLineChange, handleStrokeEnd, handleDrawingStart, handleClear, handleUndo } = handlers;
+
+  const [serverStatuses, setServerStatuses] = useState({});
 
   // State for all settings
   const [size, setSize] = useState(CANVAS_CONFIG.DEFAULT_SIZE);
@@ -32,10 +34,19 @@ export default function App() {
   const [showGuidelines, setShowGuidelines] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  // useEffect(() => {
-    // startWakeUpSequence();
-  // }, []);
-  // --- Stabilize the event handlers with useCallback to prevent re-render loops ---
+
+  useEffect(() => {
+    const handleStatusChange = (serverName, status) => {
+      setServerStatuses(prevStatuses => ({
+        ...prevStatuses,
+        [serverName]: status,
+      }));
+    };
+    
+    startWakeUpSequence(handleStatusChange);
+  }, []);
+
+  // --- Stabilize the event handlers with useCallback ---
   const onLineChangeCallback = useCallback((prevLine) => {
     handleLineChange(prevLine, guidelines, 10);
   }, [handleLineChange, guidelines]);
@@ -65,7 +76,7 @@ export default function App() {
         </button>
         <h1 className="text-2xl font-bold ml-4">Hand Scribe</h1>
       </header>
-
+      
       <div className="flex flex-1 overflow-hidden">
         <aside className={`absolute lg:relative flex-shrink-0 w-72 bg-white shadow-lg lg:shadow-none p-4 flex flex-col gap-4 overflow-y-auto transition-transform duration-300 ease-in-out z-10 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <h2 className="text-xl font-semibold border-b pb-2">Settings</h2>
@@ -110,9 +121,11 @@ export default function App() {
               lineResults={lineResults}
               totalLines={guidelines}
             />
+            <ServerStatusSidebar serverStatuses={serverStatuses} />
           </div>
         </main>
       </div>
+
     </div>
   );
 }
