@@ -11,6 +11,9 @@ import ActionButtons from "./components/Controls/ActionButtons";
 import CanvasSettings from "./components/Controls/CanvasSettings";
 import ToolSettings from "./components/Controls/ToolSettings";
 
+// Import the wake-up utility function
+import { startWakeUpSequence } from './utils/serverwakeup.jsx';
+
 const MenuIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
@@ -29,7 +32,9 @@ export default function App() {
   const [showGuidelines, setShowGuidelines] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
+  // useEffect(() => {
+    // startWakeUpSequence();
+  // }, []);
   // --- Stabilize the event handlers with useCallback to prevent re-render loops ---
   const onLineChangeCallback = useCallback((prevLine) => {
     handleLineChange(prevLine, guidelines, 10);
